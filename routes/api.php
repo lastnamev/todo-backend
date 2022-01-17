@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register', [ \App\Http\Controllers\Api\PassportAuthController::class, 'register']);
 Route::post('login', [\App\Http\Controllers\Api\PassportAuthController::class, 'login']);
+Route::post('logout', [\App\Http\Controllers\Api\PassportAuthController::class, 'logout']);
 
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();

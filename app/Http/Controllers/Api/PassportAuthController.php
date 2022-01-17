@@ -44,11 +44,20 @@ class PassportAuthController extends Controller
         if (auth()->attempt($data)) {
             $token = auth()->user()->createToken('Todo')->accessToken;
 
-//            $token = Auth::user()->createToken('Todo')->accessToken;
             return response()->json(['user' => auth()->user() ,'token' => $token], 200);
         } else {
             return response()->json(['error' => 'Unauthorised'], 401);
         }
+    }
+
+    /**
+     * Logout
+     */
+    public function logout (Request $request) {
+        $token = $request->user()->token();
+        $token->revoke();
+        $response = ['message' => 'You have been successfully logged out!'];
+        return response($response, 200);
     }
 }
 
