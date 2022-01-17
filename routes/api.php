@@ -21,7 +21,7 @@ Route::post('login', [\App\Http\Controllers\Api\PassportAuthController::class, '
 //    return $request->user();
 //});
 Route::middleware('auth:api')->group(function () {
-    Route::resource('posts', \App\Http\Controllers\Api\TaskController::class);
+    Route::resource('tasks', \App\Http\Controllers\Api\TaskController::class);
     Route::get('users', function (){
         return response(\App\Models\User::all());
     });
