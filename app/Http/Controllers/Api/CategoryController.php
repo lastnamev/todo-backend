@@ -4,112 +4,53 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Todo\CategoryTodoInterface;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
 
+    private $todo;
+
+    public function __construct(CategoryTodoInterface $todo)
+    {
+        $this->todo = $todo;
+    }
+
     public function index()
     {
-        $categories = auth()->user()->categories;
+        $tasks = $this->todo->getAllCategory();
 
-        return response()->json([
-            'success' => true,
-            'data' => $categories,
-        ], 200);
+        return $tasks;
     }
 
     public function store(Request $request)
     {
-        $validate = $this->validate($request, [
-            'name' => 'required',
-        ]);
+        $task = $this->todo->addCategory($request);
 
-        $category = auth()->user()->categories()->create($validate);
-
-        if($category){
-            return response()->json([
-                'success' => true,
-                'message' => 'Категория успешно создана',
-            ], 200);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Категория не может быть создана',
-            ], 200);
-        }
-
+        return $task;
     }
 
     public function show($id)
     {
-        $categories = auth()->user()->categories()->find($id);
+        $task = $this->todo->getOneCategory($id);
 
-        if (!$categories) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Категории не существует '
-            ], 400);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $categories,
-        ], 200);
+        return $task;
     }
 
 
     public function update(Request $request, $id)
     {
-//        Временно нет валидации
+        $task = $this->todo->updateCategory($request, $id);
 
-        $categories = auth()->user()->categories()->find($id);
-
-        if (!$categories) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Такой категории не существует'
-            ], 400);
-        }
-
-        $updated = $categories->fill($request->all())->save();
-
-        if ($updated)
-            return response([
-                'success' => true
-            ]);
-        else
-            return response()->json([
-                'success' => false,
-                'message' => 'Категория не может быть обновлена'
-            ], 500);
-
+        return $task;
     }
 
 
     public function destroy($id)
     {
-        $category = auth()->user()->categories()->find($id)->delete();
+        $task = $this->todo->deleteCategory($id);
 
-        if (!$category) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Такой категории не существует'
-            ], 400);
-        }
-
-        if ($category->delete()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Категория успешно удалена',
-            ], 200);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Категория не может быть удалена'
-            ], 500);
-        }
-
-
+        return $task;
     }
 }
