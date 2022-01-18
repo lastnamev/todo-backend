@@ -8,68 +8,111 @@ use App\Models\Task;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $tasks = auth()->user()->tasks()->all();
 
-        return response([
+    public function index($id_category)
+    {
+        $tasks = auth()->user()->categories()->find($id_category)->tasks;
+
+        if(!$tasks){
+            return response()->json([
+                'success' => false,
+                'message' => 'Нет заданий'
+            ], 400);
+        }
+
+        return response()->json([
             'success' => true,
             'data' => $tasks,
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+
+    public function store(Request $request, $id_category)
     {
-        //
+        $validate = $this->validate($request, [
+            'name' => 'required',
+            'text' => 'required',
+            'completed' => 'required',
+        ]);
+
+        if(!$validate){
+            return response()->json([
+                'success' => false,
+                'message' => 'Валидация не пройдена'
+            ], 500);
+        }
+
+        $task = auth()->user()->categories()->find($id_category)->tasks()->create($validate)->get();
+
+        if($task){
+            return response()->json([
+                'success' => true,
+                'data' => $task,
+                'message' => 'Задание успешно создано',
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Задание не может быть создано',
+            ], 200);
+        }
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $task = auth()->user()->tasks()->find($id);
 
-        return response([
+    public function show($id_category, $id)
+    {
+        $task = auth()->user()->categories()->find($id_category)->tasks()->find($id);
+
+        if (!$task) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Задания не существует '
+            ], 400);
+        }
+
+        return response()->json([
             'success' => true,
             'data' => $task,
         ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+
+    public function update(Request $request, $id, $id_category)
     {
-        //
+//        Временно нет валидации
+//        $validate = $request->validate([
+//            'name'
+//        ]);
+
+
+        $task = auth()->user()->categories()->find($id_category)->tasks->find($id)->fill($request->all())->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $task,
+        ], 200);
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+
+    public function destroy($id_category, $id)
     {
-        //
+        $task = auth()->user()->categories()->find($id_category)->tasks->find($id)->delete();
+
+        if ($task->delete()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Задача успешно удалена',
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Задача не может быть удалена'
+            ], 500);
+        }
+
     }
+
+
 }

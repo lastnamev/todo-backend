@@ -22,8 +22,30 @@ Route::post('logout', [\App\Http\Controllers\Api\PassportAuthController::class, 
 //    return $request->user();
 //});
 Route::middleware('auth:api')->group(function () {
-    Route::resource('tasks', \App\Http\Controllers\Api\TaskController::class);
+//    Route::resource('tasks', \App\Http\Controllers\Api\TaskController::class);
     Route::get('users', function (){
         return response(\App\Models\User::all());
     });
+
+//    Категории
+    Route::get('category', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
+    Route::get('category/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'show']);
+    Route::post('category', [\App\Http\Controllers\Api\CategoryController::class, 'store']);
+    Route::put('category/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'update']);
+    Route::delete('category/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+
+
+//    //    Задания
+//    Route::get('{name}/task', [\App\Http\Controllers\Api\TaskController::class, 'index']);
+//    Route::get('{name}/task/{id}', [\App\Http\Controllers\Api\TaskController::class, 'show']);
+//    Route::post('{name}/task', [\App\Http\Controllers\Api\TaskController::class, 'store']);
+//    Route::put('{name}/task/{id}', [\App\Http\Controllers\Api\TaskController::class, 'update']);
+//    Route::delete('{name}/task/{id}', [\App\Http\Controllers\Api\TaskController::class, 'destroy']);
+
+    Route::get('{id_category}/task', [\App\Http\Controllers\Api\TaskController::class, 'index']);
+    Route::get('{id_category}/task/{id}', [\App\Http\Controllers\Api\TaskController::class, 'show']);
+    Route::post('{id_category}/task', [\App\Http\Controllers\Api\TaskController::class, 'store']);
+    Route::put('{id_category}/task/{id}', [\App\Http\Controllers\Api\TaskController::class, 'update']);
+    Route::delete('{id_category}/task/{id}', [\App\Http\Controllers\Api\TaskController::class, 'destroy']);
+
 });
